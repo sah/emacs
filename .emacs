@@ -1,5 +1,5 @@
-(add-to-list 'load-path "~/emacs-lisp")
-(add-to-list 'load-path "~/emacs-lisp/emacs-color-theme-solarized")
+(add-to-list 'load-path "~/emacs")
+(add-to-list 'load-path "~/emacs/emacs-color-theme-solarized")
 (add-to-list 'load-path "/usr/local/share/emacs/site-lisp")
 
 ;; jesus christ
@@ -71,7 +71,7 @@
 (require 'linum)
 (if window-system (global-linum-mode 1))
 
-(add-to-list 'load-path "~/emacs-lisp/textmate.el")
+(add-to-list 'load-path "~/emacs/textmate.el")
 (require 'textmate)
 (textmate-mode)
 
