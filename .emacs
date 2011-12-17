@@ -341,11 +341,14 @@
 
 ; I never want to lose my windows
 (condition-case ()
-    (if (console-on-window-system-p (selected-console))
+    (if window-system
         (progn
           (global-unset-key "\C-z")
           (global-set-key "\C-z" 'undo)))
   (error nil))
+
+; imenu is useful
+(global-set-key "\M-s" 'imenu)
 
 ; for cvs mode
 (setenv "CVS_RSH" "ssh")
@@ -362,6 +365,8 @@
 (autoload 'codepad-paste-region "codepad" "Paste region to codepad.org." t)
 (autoload 'codepad-paste-buffer "codepad" "Paste buffer to codepad.org." t)
 (autoload 'codepad-fetch-code "codepad" "Fetch code from codepad.org." t)
+
+
 
 (custom-set-variables
   ;; custom-set-variables was added by Custom.
