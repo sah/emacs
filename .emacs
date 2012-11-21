@@ -1,5 +1,6 @@
 (add-to-list 'load-path "~/emacs")
 (add-to-list 'load-path "~/emacs/emacs-color-theme-solarized")
+(add-to-list 'load-path "~/emacs/egg")
 (add-to-list 'load-path "/usr/local/share/emacs/site-lisp")
 
 ;; jesus christ
@@ -364,6 +365,10 @@
 
 ; for cvs mode
 (setenv "CVS_RSH" "ssh")
+
+; for git
+(require 'dominating-file)
+(require 'egg)
 
 ;;(setq sql-mysql-program "/usr/local/mysql/bin/mysql")
 

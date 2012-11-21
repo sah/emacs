@@ -1,3 +1,9 @@
 [submodule "egg"]
 	path = egg
 	url = https://github.com/bogolisk/egg.git
+[submodule "textmate.el"]
+	path = textmate.el
+	url = https://github.com/defunkt/textmate.el.git
+[submodule "emacs-color-theme-solarized"]
+	path = emacs-color-theme-solarized
+	url = https://github.com/sellout/emacs-color-theme-solarized.git
