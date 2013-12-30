@@ -7,3 +7,6 @@
 [submodule "emacs-color-theme-solarized"]
 	path = emacs-color-theme-solarized
 	url = https://github.com/sellout/emacs-color-theme-solarized.git
+[submodule "emacs-powerline"]
+	path = emacs-powerline
+	url = ./emacs-powerline
