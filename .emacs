@@ -1,7 +1,13 @@
 (add-to-list 'load-path "~/emacs")
 (add-to-list 'load-path "~/emacs/emacs-color-theme-solarized")
 (add-to-list 'load-path "~/emacs/egg")
+(add-to-list 'load-path "~/emacs/emacs-powerline")
 (add-to-list 'load-path "/usr/local/share/emacs/site-lisp")
+(when
+    (load
+     (expand-file-name "~/.emacs.d/elpa/package.el"))
+  (package-initialize))
+(setq custom-theme-load-path '("~/emacs/emacs-color-theme-solarized"))
 
 ;; jesus christ
 (global-unset-key "\M-g")
@@ -53,6 +59,7 @@
        (add-to-list 'default-frame-alist '(cursor-color . "#dc322f")))
   ;; default colors in a terminal
   (progn
+    ;(enable-theme 'solarized-dark)
     (set-face-background 'isearch "yellow")
     (set-face-foreground 'isearch "black")
     (set-face-background 'isearch-lazy-highlight-face "gray")
@@ -66,7 +73,8 @@
     (set-face-background 'show-paren-mismatch-face "red")
     (set-face-foreground 'show-paren-mismatch-face "black")
     (set-face-bold-p 'show-paren-mismatch-face t)
-    (set-face-underline-p 'show-paren-mismatch-face t)))
+    (set-face-underline-p 'show-paren-mismatch-face t)
+    ))
 
 ;; for line numbers
 (require 'linum)
@@ -383,37 +391,41 @@
 (autoload 'codepad-paste-buffer "codepad" "Paste buffer to codepad.org." t)
 (autoload 'codepad-fetch-code "codepad" "Fetch code from codepad.org." t)
 
+; powerline!
+(if window-system (require 'powerline))
 
+;; Enable mouse support
+(unless window-system
+  (require 'mouse)
+  (xterm-mouse-mode t)
+  (global-set-key [mouse-4] '(lambda ()
+                               (interactive)
+                               (scroll-down 1)))
+  (global-set-key [mouse-5] '(lambda ()
+                               (interactive)
+                               (scroll-up 1)))
+  (defun track-mouse (e))
+  (setq mouse-sel-mode t)
+)
 
-(custom-set-variables
-  ;; custom-set-variables was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
- '(blink-cursor-mode nil)
- '(column-number-mode t)
- '(load-home-init-file t t)
- '(show-paren-mode t)
- '(transient-mark-mode t)
- '(paren-mode (quote paren) nil (paren))
- '(toolbar-visible-p nil)
- '(font-lock-mode nil nil (font-lock)))
-(custom-set-faces
-  ;; custom-set-faces was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
- '(default ((t (:stipple nil :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 160 :width normal :foundry "apple" :family "Menlo")))))
+;; (custom-set-variables
+;;   ;; custom-set-variables was added by Custom.
+;;   ;; If you edit it by hand, you could mess it up, so be careful.
+;;   ;; Your init file should contain only one such instance.
+;;   ;; If there is more than one, they won't work right.
+;;  '(blink-cursor-mode nil)
+;;  '(column-number-mode t)
+;;  '(load-home-init-file t t)
+;;  '(show-paren-mode t)
+;;  '(transient-mark-mode t)
+;;  '(paren-mode (quote paren) nil (paren))
+;;  '(toolbar-visible-p nil)
+;;  '(font-lock-mode nil nil (font-lock)))
+;; (custom-set-faces
+;;   ;; custom-set-faces was added by Custom.
+;;   ;; If you edit it by hand, you could mess it up, so be careful.
+;;   ;; Your init file should contain only one such instance.
+;;   ;; If there is more than one, they won't work right.
+;;  '(default ((t (:stipple nil :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 160 :width normal :foundry "apple" :family "Menlo")))))
 
 (condition-case () (require 'local) (error nil))
-
-
-;;; This was installed by package-install.el.
-;;; This provides support for the package system and
-;;; interfacing with ELPA, the package archive.
-;;; Move this code earlier if you want to reference
-;;; packages in your .emacs.
-(when
-    (load
-     (expand-file-name "~/.emacs.d/elpa/package.el"))
-  (package-initialize))
