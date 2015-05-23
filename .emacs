@@ -85,9 +85,10 @@
 (textmate-mode)
 
 ;; python mode stuff
-(autoload 'python-mode "python-mode" "Python editing mode." t)
-(add-to-list 'auto-mode-alist '("\\.py$" . python-mode))
-(add-to-list 'interpreter-mode-alist '("python" . python-mode))
+(when (< emacs-major-version 24)
+  (autoload 'python-mode "python-mode" "Python editing mode." t)
+  (add-to-list 'auto-mode-alist '("\\.py$" . python-mode))
+  (add-to-list 'interpreter-mode-alist '("python" . python-mode)))
 (add-hook 'find-file-hook 'flymake-find-file-hook)
 (when (load "flymake" t)
   (defun flymake-pyflakes-init ()
@@ -406,6 +407,23 @@
                                (scroll-up 1)))
   (defun track-mouse (e))
   (setq mouse-sel-mode t)
+)
+
+
+(if (eq system-type 'darwin)
+  (progn
+    (defun copy-from-osx ()
+      (shell-command-to-string "pbpaste"))
+
+    (defun paste-to-osx (text &optional push)
+      (let ((process-connection-type nil))
+        (let ((proc (start-process "pbcopy" "*Messages*" "pbcopy")))
+          (process-send-string proc text)
+          (process-send-eof proc))))
+
+    (setq interprogram-cut-function 'paste-to-osx)
+    (setq interprogram-paste-function 'copy-from-osx)
+  )
 )
 
 ;; (custom-set-variables
