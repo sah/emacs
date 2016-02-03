@@ -2,6 +2,7 @@
 (add-to-list 'load-path "~/emacs/emacs-color-theme-solarized")
 (add-to-list 'load-path "~/emacs/egg")
 (add-to-list 'load-path "~/emacs/emacs-powerline")
+(add-to-list 'load-path "~/emacs/haskell-mode")
 (add-to-list 'load-path "/usr/local/share/emacs/site-lisp")
 (when
     (load
@@ -129,6 +130,8 @@
 ;             ))
 
 ;; haskell mode stuff
+(autoload 'haskell-mode "haskell-mode" "Haskell editing mode." t)
+(add-to-list 'auto-mode-alist '("\\.hs$" . haskell-mode))
 (condition-case ()
     (load "~/emacs-lisp/haskell-mode/haskell-site-file")
   (error nil))
