@@ -58,21 +58,6 @@
 (setq kept-new-versions 10)
 (setq version-control t)
 
-(set-face-background 'show-paren-match-face nil)
-(set-face-foreground 'show-paren-match-face nil)
-(set-face-bold 'show-paren-match-face t)
-(set-face-underline 'show-paren-match-face t)
-(set-face-background 'show-paren-mismatch-face "black")
-(set-face-foreground 'show-paren-mismatch-face "red")
-(set-face-bold 'show-paren-mismatch-face t)
-(set-face-underline 'show-paren-mismatch-face t)
-(set-face-background 'isearch "black")
-(set-face-foreground 'isearch "#30abe2")
-(set-face-background 'isearch-lazy-highlight-face "black")
-(set-face-foreground 'isearch-lazy-highlight-face "orange")
-(set-face-background 'region "black")
-(set-face-foreground 'region "#30abe2")
-
 (if window-system
      (progn
        (server-start)
@@ -81,8 +66,8 @@
        (add-to-list 'default-frame-alist '(height . 60))
        (add-to-list 'default-frame-alist '(cursor-color . "#dc322f")))
   (progn
-    ;this line fixes the solarized background, if it fucks up
-    ;(custom-set-faces '(default ((t (:background "nil")))))
+    ;;this line fixes the solarized background, if it fucks up
+    ;;(custom-set-faces '(default ((t (:background "nil")))))
     ))
 
 ;; for line numbers
@@ -241,25 +226,36 @@
         (theme-violet "#6c71c4")
         (theme-blue "#268bd2")
         (theme-cyan "#2aa198")
-        (theme-green "#859900"))
-    (set-face-foreground 'highlight-indent-guides-character-face "black")
+        (theme-green "#859900")
+        (theme-lightblue "#30abe2"))
+    (set-face-background 'show-paren-match-face nil)
+    (set-face-foreground 'show-paren-match-face nil)
+    (set-face-bold 'show-paren-match-face t)
+    (set-face-underline 'show-paren-match-face t)
+    (set-face-background 'show-paren-mismatch-face "red")
+    (set-face-foreground 'show-paren-mismatch-face "black")
+    (set-face-bold 'show-paren-mismatch-face t)
+    (set-face-underline 'show-paren-mismatch-face t)
+    (set-face-background 'isearch "black")
+    (set-face-foreground 'isearch theme-lightblue)
+    (set-face-background 'isearch-lazy-highlight-face "black")
+    (set-face-foreground 'isearch-lazy-highlight-face "orange")
+    (set-face-background 'region "black")
+    (set-face-foreground 'region theme-lightblue)
+    (set-face-foreground 'font-lock-comment-face "#586e75")
+    (set-face-foreground 'font-lock-string-face theme-yellow)
+    (set-face-foreground 'font-lock-keyword-face theme-violet)
+    (set-face-foreground 'font-lock-type-face theme-cyan)
+    (set-face-foreground 'font-lock-function-name-face theme-blue)
+    (set-face-foreground 'font-lock-variable-name-face theme-blue)
+    (set-face-foreground 'font-lock-constant-face theme-yellow)
     (if window-system
         (progn
-          ;(set-face-foreground 'font-lock-string-face theme-yellow)
-          ;(set-face-foreground 'font-lock-keyword-face theme-violet)
-          ;(set-face-foreground 'font-lock-type-face theme-cyan)
-          )
       (progn
-        (set-face-foreground 'font-lock-comment-face "#586e75")
-        (set-face-foreground 'font-lock-string-face theme-yellow)
-        (set-face-foreground 'font-lock-keyword-face theme-violet)
-        (set-face-foreground 'font-lock-type-face theme-cyan)
-        (set-face-foreground 'font-lock-function-name-face theme-blue)
-        (set-face-foreground 'font-lock-variable-name-face theme-blue)
-        (set-face-foreground 'font-lock-constant-face theme-yellow)
-        ))
+        (set-face-foreground 'highlight-indent-guides-character-face "dimgray")
+        )))
     )
-)
+  )
 
 (defun jwz-untabify ()
   (save-excursion
@@ -394,9 +390,6 @@
 (require 'dominating-file)
 (require 'egg)
 
-;(require 'indent-guide)
-;(indent-guide-global-mode)
-(setq highlight-indent-guides-auto-enabled nil)
 (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
 (setq highlight-indent-guides-method 'character)
 
