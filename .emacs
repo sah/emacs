@@ -1,4 +1,4 @@
-
+1
 ;; Added by Package.el.  This must come before configurations of
 ;; installed packages.  Don't delete this line.  If you don't want it,
 ;; just comment it out by adding a semicolon to the start of the line.
@@ -7,9 +7,6 @@
 
 (add-to-list 'load-path "~/emacs")
 (add-to-list 'load-path "~/emacs/emacs-color-theme-solarized")
-(add-to-list 'load-path "~/emacs/egg")
-(add-to-list 'load-path "~/emacs/emacs-powerline")
-(add-to-list 'load-path "~/emacs/haskell-mode")
 (add-to-list 'load-path "/usr/local/share/emacs/site-lisp")
 (require 'package)
 (add-to-list 'package-archives
@@ -85,14 +82,6 @@
 
 (global-flycheck-mode)
 
-;; mako mode stuff
-(condition-case ()
-    (progn
-      (load "mmm-mako.el")
-      (add-to-list 'auto-mode-alist '("\\.mako\\'" . html-mode))
-      (mmm-add-mode-ext-class 'html-mode "\\.mako\\'" 'mako))
-  (error nil))
-
 ;; js mode stuff
 (autoload 'js2-mode "js2" nil t)
 (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
@@ -124,9 +113,6 @@
 (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
 ;;(add-hook 'haskell-mode-hook 'turn-on-haskell-simple-indent)
 (setq haskell-program-name "/usr/bin/ghci")
-
-;; scala mode stuff
-(require 'scala-mode-auto)
 
 ;; go mode stuff
 (defun my-go-mode-hook ()
@@ -395,7 +381,6 @@
 
 ; for git
 (require 'dominating-file)
-(require 'egg)
 
 (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
 (setq highlight-indent-guides-method 'character)
@@ -414,7 +399,10 @@
 (autoload 'codepad-fetch-code "codepad" "Fetch code from codepad.org." t)
 
 ; powerline!
-(if window-system (require 'powerline))
+(if window-system
+    (progn
+      (require 'powerline)
+      (powerline-default-theme)))
 
 ;; Enable mouse support
 (unless window-system
@@ -458,6 +446,12 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (browse-kill-ring default-text-scale ivy projectile flycheck highlight-indent-guides company relax go-mode go-autocomplete gist exec-path-from-shell))))
+    (powerline haskell-mode scala-mode graphviz-dot-mode yaml-mode browse-kill-ring default-text-scale ivy projectile flycheck highlight-indent-guides company relax go-mode go-autocomplete gist exec-path-from-shell))))
 (provide '.emacs)
 ;;; .emacs ends here
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
