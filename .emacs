@@ -72,7 +72,14 @@
 
 ;; for line numbers
 (require 'linum)
-(if window-system (global-linum-mode 1))
+(global-linum-mode 1)
+(unless window-system
+  (progn
+    (defun linum-format-func (line)
+      "Align number for LINE right and pad the right with one space."
+      (let ((w (length (number-to-string (count-lines (point-min) (point-max))))))
+        (propertize (format (format "%%%dd " w) line) 'face 'linum)))
+    (setq linum-format 'linum-format-func)))
 
 (ivy-mode)
 
