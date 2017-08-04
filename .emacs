@@ -10,12 +10,17 @@
 (add-to-list 'load-path "~/emacs/egg")
 (add-to-list 'load-path "~/emacs/emacs-powerline")
 (add-to-list 'load-path "~/emacs/haskell-mode")
-(add-to-list 'load-path "~/emacs/indent-guide")
 (add-to-list 'load-path "/usr/local/share/emacs/site-lisp")
 (require 'package)
 (add-to-list 'package-archives
              '("melpa" . "http://melpa.milkbox.net/packages/") t)
+
+; solarized
 (setq custom-theme-load-path '("~/emacs/emacs-color-theme-solarized"))
+(load-theme 'solarized t)
+(set-frame-parameter nil 'background-mode 'dark)
+(set-terminal-parameter nil 'background-mode 'dark)
+(enable-theme 'solarized)
 
 ;; jesus christ
 (global-unset-key "\M-g")
@@ -53,35 +58,31 @@
 (setq kept-new-versions 10)
 (setq version-control t)
 
-(if window-system (setq visible-bell t))
+(set-face-background 'show-paren-match-face nil)
+(set-face-foreground 'show-paren-match-face nil)
+(set-face-bold 'show-paren-match-face t)
+(set-face-underline 'show-paren-match-face t)
+(set-face-background 'show-paren-mismatch-face "black")
+(set-face-foreground 'show-paren-mismatch-face "red")
+(set-face-bold 'show-paren-mismatch-face t)
+(set-face-underline 'show-paren-mismatch-face t)
+(set-face-background 'isearch "black")
+(set-face-foreground 'isearch "#30abe2")
+(set-face-background 'isearch-lazy-highlight-face "black")
+(set-face-foreground 'isearch-lazy-highlight-face "orange")
+(set-face-background 'region "black")
+(set-face-foreground 'region "#30abe2")
 
 (if window-system
-    ;; default colors if we're not in a terminal
      (progn
        (server-start)
-       (enable-theme 'solarized-dark)
-       ;;(set-face-background 'default "#dfdbc3")
-       ;;(set-face-foreground 'default "#3b2322")
+       (setq visible-bell t)
        (add-to-list 'default-frame-alist '(width . 84))
        (add-to-list 'default-frame-alist '(height . 60))
        (add-to-list 'default-frame-alist '(cursor-color . "#dc322f")))
-  ;; default colors in a terminal
   (progn
-    ;;(enable-theme 'solarized-dark)
-    (set-face-background 'isearch "yellow")
-    (set-face-foreground 'isearch "black")
-    (set-face-background 'isearch-lazy-highlight-face "gray")
-    (set-face-foreground 'isearch-lazy-highlight-face "black")
-    (set-face-background 'region "lightblue")
-    (set-face-foreground 'region "black")
-    (set-face-background 'show-paren-match-face nil)
-    (set-face-foreground 'show-paren-match-face nil)
-    (set-face-bold 'show-paren-match-face t)
-    (set-face-underline 'show-paren-match-face t)
-    (set-face-background 'show-paren-mismatch-face "red")
-    (set-face-foreground 'show-paren-mismatch-face "black")
-    (set-face-bold 'show-paren-mismatch-face t)
-    (set-face-underline 'show-paren-mismatch-face t)
+    ;this line fixes the solarized background, if it fucks up
+    ;(custom-set-faces '(default ((t (:background "nil")))))
     ))
 
 ;; for line numbers
@@ -107,7 +108,6 @@
 ;; php mode stuff
 (autoload 'php-mode "php-mode" "PHP editing mode." t)
 (add-to-list 'auto-mode-alist '("\\.php$" . php-mode))
-
 
 ;; ruby mode stuff
 (autoload 'ruby-mode "ruby-mode" "Ruby editing mode." t)
@@ -245,9 +245,9 @@
     (set-face-foreground 'highlight-indent-guides-character-face "black")
     (if window-system
         (progn
-          (set-face-foreground 'font-lock-string-face theme-yellow)
-          (set-face-foreground 'font-lock-keyword-face theme-violet)
-          (set-face-foreground 'font-lock-type-face theme-cyan)
+          ;(set-face-foreground 'font-lock-string-face theme-yellow)
+          ;(set-face-foreground 'font-lock-keyword-face theme-violet)
+          ;(set-face-foreground 'font-lock-type-face theme-cyan)
           )
       (progn
         (set-face-foreground 'font-lock-comment-face "#586e75")
@@ -377,11 +377,15 @@
     (if window-system
         (progn
           (global-unset-key "\C-z")
-          (global-set-key "\C-z" 'undo)))
+          (global-set-key "\C-z" 'undo)
+          (global-set-key (kbd "s-z") 'undo)))
   (error nil))
 
-; imenu is useful
-(global-set-key "\M-s" 'imenu)
+; font size like a modern mac
+(global-set-key (kbd "s-=") 'default-text-scale-increase)
+(global-set-key (kbd "s-+") 'default-text-scale-increase)
+(global-set-key (kbd "s--") 'default-text-scale-decrease)
+(global-set-key (kbd "s-_") 'default-text-scale-decrease)
 
 ; for cvs mode
 (setenv "CVS_RSH" "ssh")
@@ -446,50 +450,14 @@
 ; this is slow, use only when needed
 ;(load-file "~/emacs/graphviz-dot-mode.el")
 
-;; (custom-set-variables
-;;   ;; custom-set-variables was added by Custom.
-;;   ;; If you edit it by hand, you could mess it up, so be careful.
-;;   ;; Your init file should contain only one such instance.
-;;   ;; If there is more than one, they won't work right.
-;;  '(blink-cursor-mode nil)
-;;  '(column-number-mode t)
-;;  '(load-home-init-file t t)
-;;  '(show-paren-mode t)
-;;  '(transient-mark-mode t)
-;;  '(paren-mode (quote paren) nil (paren))
-;;  '(toolbar-visible-p nil)
-;;  '(font-lock-mode nil nil (font-lock)))
-;; (custom-set-faces
-;;   ;; custom-set-faces was added by Custom.
-;;   ;; If you edit it by hand, you could mess it up, so be careful.
-;;   ;; Your init file should contain only one such instance.
-;;   ;; If there is more than one, they won't work right.
-;;  '(default ((t (:stipple nil :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 160 :width normal :foundry "apple" :family "Menlo")))))
-
 (condition-case () (require 'local) (error nil))
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(flymake-allowed-file-name-masks
-   (quote
-    (("\\.py\\'" flymake-pyflakes-init nil nil)
-     ("\\.\\(?:c\\(?:pp\\|xx\\|\\+\\+\\)?\\|CC\\)\\'" flymake-simple-make-init nil nil)
-     ("\\.cs\\'" flymake-simple-make-init nil nil)
-     ("\\.p[ml]\\'" flymake-perl-init nil nil)
-     ("\\.php[345]?\\'" flymake-php-init nil nil)
-     ("\\.h\\'" flymake-master-make-header-init flymake-master-cleanup nil)
-     ("\\.java\\'" flymake-simple-make-java-init flymake-simple-java-cleanup nil)
-     ("[0-9]+\\.tex\\'" flymake-master-tex-init flymake-master-cleanup nil)
-     ("\\.tex\\'" flymake-simple-tex-init nil nil)
-     ("\\.idl\\'" flymake-simple-make-init nil nil))))
  '(package-selected-packages
    (quote
-    (ivy projectile flycheck highlight-indent-guides company relax go-mode go-autocomplete gist exec-path-from-shell))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+    (browse-kill-ring default-text-scale ivy projectile flycheck highlight-indent-guides company relax go-mode go-autocomplete gist exec-path-from-shell))))
+(provide '.emacs)
+;;; .emacs ends here
