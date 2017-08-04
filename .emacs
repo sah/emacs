@@ -1,13 +1,20 @@
+
+;; Added by Package.el.  This must come before configurations of
+;; installed packages.  Don't delete this line.  If you don't want it,
+;; just comment it out by adding a semicolon to the start of the line.
+;; You may delete these explanatory comments.
+(package-initialize)
+
 (add-to-list 'load-path "~/emacs")
 (add-to-list 'load-path "~/emacs/emacs-color-theme-solarized")
 (add-to-list 'load-path "~/emacs/egg")
 (add-to-list 'load-path "~/emacs/emacs-powerline")
 (add-to-list 'load-path "~/emacs/haskell-mode")
+(add-to-list 'load-path "~/emacs/indent-guide")
 (add-to-list 'load-path "/usr/local/share/emacs/site-lisp")
-(when
-    (load
-     (expand-file-name "~/.emacs.d/elpa/package.el"))
-  (package-initialize))
+(require 'package)
+(add-to-list 'package-archives
+             '("melpa" . "http://melpa.milkbox.net/packages/") t)
 (setq custom-theme-load-path '("~/emacs/emacs-color-theme-solarized"))
 
 ;; jesus christ
@@ -53,14 +60,14 @@
      (progn
        (server-start)
        (enable-theme 'solarized-dark)
-       ;(set-face-background 'default "#dfdbc3")
-       ;(set-face-foreground 'default "#3b2322")
+       ;;(set-face-background 'default "#dfdbc3")
+       ;;(set-face-foreground 'default "#3b2322")
        (add-to-list 'default-frame-alist '(width . 84))
        (add-to-list 'default-frame-alist '(height . 60))
        (add-to-list 'default-frame-alist '(cursor-color . "#dc322f")))
   ;; default colors in a terminal
   (progn
-    ;(enable-theme 'solarized-dark)
+    ;;(enable-theme 'solarized-dark)
     (set-face-background 'isearch "yellow")
     (set-face-foreground 'isearch "black")
     (set-face-background 'isearch-lazy-highlight-face "gray")
@@ -140,11 +147,41 @@
 ;;(add-hook 'haskell-mode-hook 'turn-on-haskell-simple-indent)
 (setq haskell-program-name "/usr/bin/ghci")
 
-;; go mode stuff
-(require 'go-mode-load)
-
 ;; scala mode stuff
 (require 'scala-mode-auto)
+
+;; go mode stuff
+(defun my-go-mode-hook ()
+  ;; Call Gofmt before saving
+  (add-hook 'before-save-hook 'gofmt-before-save)
+  ;; Use goimports instead of go-fmt
+  (setq gofmt-command "goimports")
+  ;; Godef jump key binding
+  (local-set-key (kbd "M-.") 'godef-jump)
+  (local-set-key (kbd "M-*") 'pop-tag-mark)
+  ;; autocomplete
+  (auto-complete-mode 1)
+  ;; Customize compile command to run go build
+  (if (not (string-match "go" compile-command))
+      (set (make-local-variable 'compile-command)
+           "go build -v && go test -v && go vet"))
+  )
+(add-hook 'go-mode-hook 'my-go-mode-hook)
+(with-eval-after-load 'go-mode
+  (require 'go-autocomplete)
+  (require 'auto-complete-config)
+  (ac-config-default)
+  (setq ac-auto-start nil)
+  (global-set-key "\M-/" 'auto-complete)
+)
+
+(add-hook 'after-init-hook 'global-company-mode)
+(global-set-key "\M-/" 'company-complete)
+
+;; yaml-mode stuff
+(require 'yaml-mode)
+(add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
+
 
 ;; Emacs/W3 Configuration
 (condition-case () (require 'w3-auto "w3-auto") (error nil))
@@ -182,8 +219,7 @@
         ;; fucking make these fucking variables local where it fucking
         ;; should, so the c-set-style we're about to do below breaks
         ;; fucking fill-paragraph for fucking all non-c-like modes by
-        ;; fucking default.  Someone desperately needs to die, and I'm
-        ;; pretty sure it's not just me.
+        ;; fucking default.
         (make-local-variable 'paragraph-start)
         (make-local-variable 'paragraph-separate)
 
@@ -220,6 +256,7 @@
         (theme-blue "#268bd2")
         (theme-cyan "#2aa198")
         (theme-green "#859900"))
+    (set-face-foreground 'highlight-indent-guides-character-face "black")
     (if window-system
         (progn
           (set-face-foreground 'font-lock-string-face theme-yellow)
@@ -294,17 +331,6 @@
                (set-tabs nil nil)
                )))
 
-; go has the most obnoxious conventions of any of these languages
-(dolist (mode '(
-                go-mode-hook
-                )
-              nil)
-  (add-hook mode
-            '(lambda ()
-               (set-tabs nil t)
-               )))
-
-
 (setq minibuffer-max-depth nil)
 
 (line-number-mode t)
@@ -317,38 +343,38 @@
 ;; directory of buffer with a magic name (say, "Makefile").  If that
 ;; buffer doesn't exist, use make-cwd to default to the directory from
 ;; which emacs was run.
-(defun make-mf ()
-  (interactive)
-  (with-current-buffer magic-make-buffer-name
-    (compile "make")))
+;; (defun make-mf ()
+;;   (interactive)
+;;   (with-current-buffer magic-make-buffer-name
+;;     (compile "make")))
 
-(defun make-cwd ()
-  (interactive)
-  (let ((curdir default-directory))
-    (unwind-protect
-        ((progn
-           (cd-absolute command-line-default-directory)
-           (compile "make")))
-      (cd-absolute curdir))))
+;; (defun make-cwd ()
+;;   (interactive)
+;;   (let ((curdir default-directory))
+;;     (unwind-protect
+;;         ((progn
+;;            (cd-absolute command-line-default-directory)
+;;            (compile "make")))
+;;       (cd-absolute curdir))))
 
-(defun make ()
-  (interactive)
-  (if (or (file-exists-p "Makefile")
-          (file-exists-p "makefile")
-          (file-exists-p "GNUmakefile"))
-      (compile "make")
-    (if (eq nil (get-buffer magic-make-buffer-name))
-        (make-cwd)
-      (make-mf))))
+;; (defun make ()
+;;   (interactive)
+;;   (if (or (file-exists-p "Makefile")
+;;           (file-exists-p "makefile")
+;;           (file-exists-p "GNUmakefile"))
+;;       (compile "make")
+;;     (if (eq nil (get-buffer magic-make-buffer-name))
+;;         (make-cwd)
+;;       (make-mf))))
 
-(defun make-clean ()
-  (interactive)
-  (with-current-buffer magic-make-buffer-name
-    (compile "make clean")))
+;; (defun make-clean ()
+;;   (interactive)
+;;   (with-current-buffer magic-make-buffer-name
+;;     (compile "make clean")))
 
-(setq magic-make-buffer-name "Makefile")
+;; (setq magic-make-buffer-name "Makefile")
 
-(define-key global-map [(control return)] 'make)
+;; (define-key global-map [(control return)] 'make)
 
 ; make home and end do what they do on windows
 (define-key global-map [find] `beginning-of-line)
@@ -377,6 +403,12 @@
 ; for git
 (require 'dominating-file)
 (require 'egg)
+
+;(require 'indent-guide)
+;(indent-guide-global-mode)
+(setq highlight-indent-guides-auto-enabled nil)
+(add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
+(setq highlight-indent-guides-method 'character)
 
 ;;(setq sql-mysql-program "/usr/local/mysql/bin/mysql")
 
@@ -425,6 +457,8 @@
   )
 )
 
+(load-file "~/emacs/graphviz-dot-mode.el")
+
 ;; (custom-set-variables
 ;;   ;; custom-set-variables was added by Custom.
 ;;   ;; If you edit it by hand, you could mess it up, so be careful.
@@ -446,3 +480,29 @@
 ;;  '(default ((t (:stipple nil :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 160 :width normal :foundry "apple" :family "Menlo")))))
 
 (condition-case () (require 'local) (error nil))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(flymake-allowed-file-name-masks
+   (quote
+    (("\\.py\\'" flymake-pyflakes-init nil nil)
+     ("\\.\\(?:c\\(?:pp\\|xx\\|\\+\\+\\)?\\|CC\\)\\'" flymake-simple-make-init nil nil)
+     ("\\.cs\\'" flymake-simple-make-init nil nil)
+     ("\\.p[ml]\\'" flymake-perl-init nil nil)
+     ("\\.php[345]?\\'" flymake-php-init nil nil)
+     ("\\.h\\'" flymake-master-make-header-init flymake-master-cleanup nil)
+     ("\\.java\\'" flymake-simple-make-java-init flymake-simple-java-cleanup nil)
+     ("[0-9]+\\.tex\\'" flymake-master-tex-init flymake-master-cleanup nil)
+     ("\\.tex\\'" flymake-simple-tex-init nil nil)
+     ("\\.idl\\'" flymake-simple-make-init nil nil))))
+ '(package-selected-packages
+   (quote
+    (highlight-indent-guides company relax go-mode go-autocomplete gist exec-path-from-shell))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )

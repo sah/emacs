@@ -10,3 +10,6 @@
 [submodule "emacs-powerline"]
 	path = emacs-powerline
 	url = ./emacs-powerline
+[submodule "indent-guide"]
+	path = indent-guide
+	url = https://github.com/zk-phi/indent-guide.git
