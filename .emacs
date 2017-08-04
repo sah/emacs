@@ -76,35 +76,21 @@
     (set-face-foreground 'region "black")
     (set-face-background 'show-paren-match-face nil)
     (set-face-foreground 'show-paren-match-face nil)
-    (set-face-bold-p 'show-paren-match-face t)
-    (set-face-underline-p 'show-paren-match-face t)
+    (set-face-bold 'show-paren-match-face t)
+    (set-face-underline 'show-paren-match-face t)
     (set-face-background 'show-paren-mismatch-face "red")
     (set-face-foreground 'show-paren-mismatch-face "black")
-    (set-face-bold-p 'show-paren-mismatch-face t)
-    (set-face-underline-p 'show-paren-mismatch-face t)
+    (set-face-bold 'show-paren-mismatch-face t)
+    (set-face-underline 'show-paren-mismatch-face t)
     ))
 
 ;; for line numbers
 (require 'linum)
 (if window-system (global-linum-mode 1))
 
-(add-to-list 'load-path "~/emacs/textmate.el")
-(require 'textmate)
-(textmate-mode)
+(ivy-mode)
 
-;; python mode stuff
-(add-hook 'find-file-hook 'flymake-find-file-hook)
-(when (load "flymake" t)
-  (defun flymake-pyflakes-init ()
-    (let* ((temp-file (flymake-init-create-temp-buffer-copy
-                       'flymake-create-temp-inplace))
-           (local-file (file-relative-name
-                        temp-file
-                        (file-name-directory buffer-file-name))))
-      (list "~/bin/pycheckers"  (list local-file))))
-  (add-to-list 'flymake-allowed-file-name-masks
-               '("\\.py\\'" flymake-pyflakes-init)))
-(load-library "flymake-cursor")
+(global-flycheck-mode)
 
 ;; mako mode stuff
 (condition-case ()
@@ -457,7 +443,8 @@
   )
 )
 
-(load-file "~/emacs/graphviz-dot-mode.el")
+; this is slow, use only when needed
+;(load-file "~/emacs/graphviz-dot-mode.el")
 
 ;; (custom-set-variables
 ;;   ;; custom-set-variables was added by Custom.
@@ -499,7 +486,7 @@
      ("\\.idl\\'" flymake-simple-make-init nil nil))))
  '(package-selected-packages
    (quote
-    (highlight-indent-guides company relax go-mode go-autocomplete gist exec-path-from-shell))))
+    (ivy projectile flycheck highlight-indent-guides company relax go-mode go-autocomplete gist exec-path-from-shell))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
