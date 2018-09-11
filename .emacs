@@ -1,4 +1,3 @@
-1
 ;; Added by Package.el.  This must come before configurations of
 ;; installed packages.  Don't delete this line.  If you don't want it,
 ;; just comment it out by adding a semicolon to the start of the line.
@@ -18,6 +17,10 @@
 (set-frame-parameter nil 'background-mode 'dark)
 (set-terminal-parameter nil 'background-mode 'dark)
 (enable-theme 'solarized)
+
+; fairyfloss
+;(setq custom-theme-load-path '("~/emacs/fairyfloss"))
+;(load-theme 'fairyfloss t)
 
 ;; jesus christ
 (global-unset-key "\M-g")
@@ -78,7 +81,7 @@
         (propertize (format (format "%%%dd " w) line) 'face 'linum)))
     (setq linum-format 'linum-format-func)))
 
-(ivy-mode)
+;(ivy-mode)
 
 (global-flycheck-mode)
 
@@ -100,8 +103,7 @@
 ;  "Set local key defs for inf-ruby in ruby-mode")
 ;(add-hook 'ruby-mode-hook
 ;          '(lambda ()
-;             (inf-ruby-keys)
-;             ))
+;             (inf-ruby-keys)))
 
 ;; haskell mode stuff
 (autoload 'haskell-mode "haskell-mode" "Haskell editing mode." t)
@@ -128,16 +130,14 @@
   ;; Customize compile command to run go build
   (if (not (string-match "go" compile-command))
       (set (make-local-variable 'compile-command)
-           "go build -v && go test -v && go vet"))
-  )
+           "go build -v && go test -v && go vet")))
 (add-hook 'go-mode-hook 'my-go-mode-hook)
 (with-eval-after-load 'go-mode
   (require 'go-autocomplete)
   (require 'auto-complete-config)
   (ac-config-default)
   (setq ac-auto-start nil)
-  (global-set-key "\M-/" 'auto-complete)
-)
+  (global-set-key "\M-/" 'auto-complete))
 
 (add-hook 'after-init-hook 'global-company-mode)
 (global-set-key "\M-/" 'company-complete)
@@ -150,18 +150,8 @@
 ;; Emacs/W3 Configuration
 (condition-case () (require 'w3-auto "w3-auto") (error nil))
 
-;; svn mode stuff
-(condition-case ()
-    (progn
-      (require 'psvn)
-      (set-face-foreground 'svn-status-filename-face "antique white")
-      (set-face-foreground 'svn-status-directory-face "light sky blue")
-      (set-face-foreground 'svn-status-marked-face "yellow")
-      (set-face-foreground 'svn-status-modified-external-face "coral"))
-  (error nil))
-
 ;; where is lisp?
-(setq inferior-lisp-program "/usr/bin/clisp")
+;(setq inferior-lisp-program "/usr/bin/clisp")
 
 
 ;; syntax highlighting
@@ -246,9 +236,7 @@
         (progn
       (progn
         (set-face-foreground 'highlight-indent-guides-character-face "dimgray")
-        )))
-    )
-  )
+        )))))
 
 (defun jwz-untabify ()
   (save-excursion
@@ -382,8 +370,8 @@
 ; for git
 (require 'dominating-file)
 
-(add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
-(setq highlight-indent-guides-method 'character)
+;;(add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
+;;(setq highlight-indent-guides-method 'character)
 
 ;;(setq sql-mysql-program "/usr/local/mysql/bin/mysql")
 
@@ -399,10 +387,8 @@
 (autoload 'codepad-fetch-code "codepad" "Fetch code from codepad.org." t)
 
 ; powerline!
-(if window-system
-    (progn
-      (require 'powerline)
-      (powerline-default-theme)))
+(require 'powerline)
+(powerline-default-theme)
 
 ;; Enable mouse support
 (unless window-system
@@ -415,25 +401,26 @@
                                (interactive)
                                (scroll-up 1)))
   (defun track-mouse (e))
-  (setq mouse-sel-mode t)
-)
+  (setq mouse-sel-mode t))
 
 
-(if (eq system-type 'darwin)
-  (progn
-    (defun copy-from-osx ()
-      (shell-command-to-string "pbpaste"))
+(if (eq system-type 'dont) ;;'darwin)
+    (progn
+      (let ((orig-paste interprogram-paste-function)
+            (orig-cut interprogram-cut-function))
+        (defun copy-from-osx ()
+          (if (executable-find "pbpaste")
+              (shell-command-to-string "pbpaste")
+            (orig-paste))
 
-    (defun paste-to-osx (text &optional push)
-      (let ((process-connection-type nil))
-        (let ((proc (start-process "pbcopy" "*Messages*" "pbcopy")))
-          (process-send-string proc text)
-          (process-send-eof proc))))
+        (defun paste-to-osx (text &optional push)
+          (let ((process-connection-type nil))
+            (let ((proc (start-process "pbcopy" "*Messages*" "pbcopy")))
+              (process-send-string proc text)
+              (process-send-eof proc)))))
 
-    (setq interprogram-cut-function 'paste-to-osx)
-    (setq interprogram-paste-function 'copy-from-osx)
-  )
-)
+      (setq interprogram-cut-function 'paste-to-osx)
+      (setq interprogram-paste-function 'copy-from-osx))))
 
 ; this is slow, use only when needed
 ;(load-file "~/emacs/graphviz-dot-mode.el")
@@ -446,7 +433,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (powerline haskell-mode scala-mode graphviz-dot-mode yaml-mode browse-kill-ring default-text-scale ivy projectile flycheck highlight-indent-guides company relax go-mode go-autocomplete gist exec-path-from-shell))))
+    (apples-mode ag groovy-mode dockerfile-mode powerline haskell-mode scala-mode graphviz-dot-mode yaml-mode browse-kill-ring default-text-scale ivy projectile flycheck highlight-indent-guides company relax go-mode go-autocomplete gist exec-path-from-shell))))
 (provide '.emacs)
 ;;; .emacs ends here
 (custom-set-faces
