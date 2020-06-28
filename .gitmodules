@@ -13,3 +13,6 @@
 [submodule "indent-guide"]
 	path = indent-guide
 	url = https://github.com/zk-phi/indent-guide.git
+[submodule "merlin"]
+	path = merlin
+	url = git@github.com:ocaml/merlin.git

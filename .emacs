@@ -11,6 +11,58 @@
 (add-to-list 'package-archives
              '("melpa" . "http://melpa.milkbox.net/packages/") t)
 
+; reason crap
+(defun init-reason-merlin ()
+  (progn
+    ;; Load a single, canonical copy of merlin-mode
+    (add-to-list 'load-path (expand-file-name "~/emacs/merlin/emacs"))
+
+    (require 'reason-mode)
+    (require 'merlin)
+    (add-hook 'reason-mode-hook (lambda ()
+                                  (add-hook 'before-save-hook 'refmt-before-save)
+                                  (merlin-mode)))
+    (setq merlin-ac-setup t)
+    (require 'merlin-iedit)
+    (defun evil-custom-merlin-iedit ()
+      (interactive)
+      (if iedit-mode (iedit-mode)
+        (merlin-iedit-occurrences)))
+    (define-key merlin-mode-map (kbd "C-c C-e") 'evil-custom-merlin-iedit)
+    (define-key merlin-mode-map (kbd "C-c M-d") 'merlin-document)))
+
+(defun init-reason ()
+  ;;----------------------------------------------------------------------------
+  ;; Reason setup
+  ;;----------------------------------------------------------------------------
+  (add-hook 'reason-mode-hook #'subword-mode)
+  (defun shell-cmd (cmd)
+    "Returns the stdout output of a shell command or nil if the command returned an error"
+    (car (ignore-errors (apply 'process-lines (split-string cmd)))))
+
+  (setq reason/refmt-bin
+        (or (shell-cmd "refmt ----where")
+            (shell-cmd "which refmt")))
+
+  (setq reason/merlin-bin
+        (or (shell-cmd "which ocamlmerlin")
+            (shell-cmd "ocamlmerlin ----where")))
+
+  (setq reason/merlin-base-dir
+        (when reason/merlin-bin
+          (replace-regexp-in-string "bin/ocamlmerlin$" "" reason/merlin-bin)))
+
+  ;; Add npm merlin.el to the emacs load path and tell emacs where to find ocamlmerlin
+  (when reason/merlin-bin
+    (setq merlin-command reason/merlin-bin))
+
+  (when reason/refmt-bin
+    (setq refmt-command reason/refmt-bin))
+
+  ;; We're working on a native project, load and use merlin
+  (init-reason-merlin))
+(init-reason)
+
 ; solarized
 (setq custom-theme-load-path '("~/emacs/emacs-color-theme-solarized"))
 (load-theme 'solarized t)
@@ -85,9 +137,18 @@
 
 (global-flycheck-mode)
 
-;; js mode stuff
-(autoload 'js2-mode "js2" nil t)
-(add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+;; web mode stuff
+(require 'web-mode)
+(add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.jsx?$" . web-mode))
+(setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
 
 ;; php mode stuff
 (autoload 'php-mode "php-mode" "PHP editing mode." t)
@@ -165,7 +226,15 @@
 ;;(remove-hook 'font-lock-mode-hook 'turn-on-fast-lock)
 ;;(remove-hook 'font-lock-mode-hook 'turn-on-lazy-shot)
 
-(defun set-tabs (c-like-p stupid-p)
+(defun infer-indentation-style ()
+  ;; if our source file uses tabs, we use tabs, if spaces spaces, and if
+  ;; neither, we use the current indent-tabs-mode
+  (let ((space-count (how-many "^  " (point-min) (point-max)))
+        (tab-count (how-many "^\t" (point-min) (point-max))))
+    (if (> space-count tab-count) (setq indent-tabs-mode nil))
+    (if (> tab-count space-count) (setq indent-tabs-mode t))))
+
+(defun set-tabs (c-like-p)
 
   (if c-like-p
       (progn
@@ -181,19 +250,18 @@
 
   (setq c-basic-indent 4) ;; xemacs
   (setq c-basic-offset 4) ;; emacs
-  (setq ruby-indent-level 2) ;; ruby-mode is stupid
+  (setq ruby-indent-level 4) ;; ruby-mode is stupid
 
   (modify-syntax-entry ?_ "_") ;; don't word-move over underscores
 
   ;; tab stuff as recommended by jwz
   ;; http://www.jwz.org/doc/tabs-vs-spaces.html
-  (if stupid-p
-      (progn
-        (setq tab-width 4)
-        (setq indent-tabs-mode t))
-    (progn
-        (setq tab-width 8)
-        (setq indent-tabs-mode nil)))
+  (setq tab-width 8)
+  (setq indent-tabs-mode nil)
+
+  ;; above defaults are nice, but if the file already has a standard,
+  ;; keep it
+  (infer-indentation-style)
 
   ;; make case labels indent inside switch statements
   (c-set-offset 'case-label '+)
@@ -211,27 +279,27 @@
         (theme-cyan "#2aa198")
         (theme-green "#859900")
         (theme-lightblue "#30abe2"))
-    (set-face-background 'show-paren-match-face nil)
-    (set-face-foreground 'show-paren-match-face nil)
-    (set-face-bold 'show-paren-match-face t)
-    (set-face-underline 'show-paren-match-face t)
-    (set-face-background 'show-paren-mismatch-face "red")
-    (set-face-foreground 'show-paren-mismatch-face "black")
-    (set-face-bold 'show-paren-mismatch-face t)
-    (set-face-underline 'show-paren-mismatch-face t)
-    (set-face-background 'isearch "black")
-    (set-face-foreground 'isearch theme-lightblue)
-    (set-face-background 'isearch-lazy-highlight-face "black")
-    (set-face-foreground 'isearch-lazy-highlight-face "orange")
-    (set-face-background 'region "black")
-    (set-face-foreground 'region theme-lightblue)
-    (set-face-foreground 'font-lock-comment-face "#586e75")
-    (set-face-foreground 'font-lock-string-face theme-yellow)
-    (set-face-foreground 'font-lock-keyword-face theme-violet)
-    (set-face-foreground 'font-lock-type-face theme-cyan)
-    (set-face-foreground 'font-lock-function-name-face theme-blue)
-    (set-face-foreground 'font-lock-variable-name-face theme-blue)
-    (set-face-foreground 'font-lock-constant-face theme-yellow)
+    ;(set-face-background 'show-paren-match-face nil)
+    ;(set-face-foreground 'show-paren-match-face nil)
+    ;(set-face-bold 'show-paren-match-face t)
+    ;(set-face-underline 'show-paren-match-face t)
+    ;(set-face-background 'show-paren-mismatch-face "red")
+    ;(set-face-foreground 'show-paren-mismatch-face "black")
+    ;(set-face-bold 'show-paren-mismatch-face t)
+    ;(set-face-underline 'show-paren-mismatch-face t)
+    ;(set-face-background 'isearch "black")
+    ;(set-face-foreground 'isearch theme-lightblue)
+    ;(set-face-background 'isearch-lazy-highlight-face "black")
+    ;(set-face-foreground 'isearch-lazy-highlight-face "orange")
+    ;(set-face-background 'region "black")
+    ;(set-face-foreground 'region theme-lightblue)
+    ;(set-face-foreground 'font-lock-comment-face "#586e75")
+    ;(set-face-foreground 'font-lock-string-face theme-yellow)
+    ;(set-face-foreground 'font-lock-keyword-face theme-violet)
+    ;(set-face-foreground 'font-lock-type-face theme-cyan)
+    ;(set-face-foreground 'font-lock-function-name-face theme-blue)
+    ;(set-face-foreground 'font-lock-variable-name-face theme-blue)
+    ;(set-face-foreground 'font-lock-constant-face theme-yellow)
     (if window-system
         (progn
       (progn
@@ -239,59 +307,54 @@
         )))))
 
 (defun jwz-untabify ()
-  (save-excursion
-    (goto-char (point-min))
-    (while (re-search-forward "[ \t]+$" nil t)
-      (delete-region (match-beginning 0) (match-end 0)))
-    (goto-char (point-min))
-    (if (search-forward "\t" nil t)
-        (untabify (1- (point)) (point-max))))
-  nil)
+  (unless indent-tabs-mode
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward "[ \t]+$" nil t)
+        (delete-region (match-beginning 0) (match-end 0)))
+      (goto-char (point-min))
+      (if (search-forward "\t" nil t)
+          (untabify (1- (point)) (point-max))))
+    nil))
 
 ; "c-like" modes
-(dolist (mode '(
-                java-mode-hook
+(setq c-modes '(java-mode-hook
                 cperl-mode-hook
                 c-mode-hook
                 c++-mode-hook
                 php-mode-hook
-                )
-              nil)
-  (add-hook mode
-            '(lambda ()
-               (make-local-variable 'write-contents-hooks)
-               (add-hook 'write-contents-hooks 'jwz-untabify)
-               (set-tabs t nil)
-               )))
-
-(dolist (mode '(
-                )
-              nil)
-  (add-hook mode
-            '(lambda ()
-               (make-local-variable 'write-contents-hooks)
-               ;(add-hook 'write-contents-hooks 'jwz-untabify)
-               (set-tabs t t)
-               )))
+                ))
 
 ; non-"c-like" modes
-(dolist (mode '(
-                html-mode-hook
-                lisp-mode-hook
-                emacs-lisp-mode-hook
-                haskell-mode-hook
-                haskell-c-mode-hook
-                ruby-mode-hook
-                python-mode-hook
-                scala-mode-hook
-                js2-mode-hook
-                )
-              nil)
+(setq non-c-modes '(html-mode-hook
+                    lisp-mode-hook
+                    emacs-lisp-mode-hook
+                    haskell-mode-hook
+                    haskell-c-mode-hook
+                    python-mode-hook
+                    ruby-mode-hook
+                    scala-mode-hook
+                    js2-mode-hook
+                    js-mode-hook
+                    web-mode-hook
+                    ))
+
+(dolist (mode c-modes nil)
   (add-hook mode
             '(lambda ()
                (make-local-variable 'write-contents-hooks)
                (add-hook 'write-contents-hooks 'jwz-untabify)
-               (set-tabs nil nil)
+               (add-hook 'before-save-hook 'delete-trailing-whitespace)
+               (set-tabs t)
+               )))
+
+(dolist (mode non-c-modes nil)
+  (add-hook mode
+            '(lambda ()
+               (make-local-variable 'write-contents-hooks)
+               (add-hook 'write-contents-hooks 'jwz-untabify)
+               (add-hook 'before-save-hook 'delete-trailing-whitespace)
+               (set-tabs nil)
                )))
 
 (setq minibuffer-max-depth nil)
@@ -364,6 +427,11 @@
 (global-set-key (kbd "s--") 'default-text-scale-decrease)
 (global-set-key (kbd "s-_") 'default-text-scale-decrease)
 
+; paredit from iterm I guess
+(add-hook 'paredit-mode-hook (lambda ()
+    (define-key paredit-mode-map (kbd "M-[ 5 c") 'paredit-forward-slurp-sexp)
+    (define-key paredit-mode-map (kbd "M-[ 5 d") 'paredit-backward-slurp-sexp)))
+
 ; for cvs mode
 (setenv "CVS_RSH" "ssh")
 
@@ -433,7 +501,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (apples-mode ag groovy-mode dockerfile-mode powerline haskell-mode scala-mode graphviz-dot-mode yaml-mode browse-kill-ring default-text-scale ivy projectile flycheck highlight-indent-guides company relax go-mode go-autocomplete gist exec-path-from-shell))))
+    (markdown-preview-mode markdown-mode web-mode rjsx-mode js2-mode paredit cider iedit reason-mode apples-mode ag groovy-mode dockerfile-mode powerline haskell-mode scala-mode graphviz-dot-mode yaml-mode browse-kill-ring default-text-scale ivy projectile flycheck highlight-indent-guides company relax go-mode go-autocomplete gist exec-path-from-shell))))
 (provide '.emacs)
 ;;; .emacs ends here
 (custom-set-faces
