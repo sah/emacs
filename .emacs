@@ -221,7 +221,11 @@
   (global-set-key "\M-/" 'auto-complete))
 
 (add-hook 'after-init-hook 'global-company-mode)
-(global-set-key "\M-/" 'company-complete)
+(global-set-key "\M-/" '(lambda (x)
+                          (interactive "*P")
+                          (if (company-mode-on)
+                              (call-interactively 'company-complete)
+                            (call-interactively 'dabbrev-expand))))
 
 ;; yaml-mode stuff
 (require 'yaml-mode)
