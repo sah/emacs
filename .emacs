@@ -19,7 +19,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (markdown-preview-mode markdown-mode web-mode rjsx-mode js2-mode paredit cider iedit reason-mode apples-mode ag groovy-mode dockerfile-mode powerline haskell-mode scala-mode graphviz-dot-mode yaml-mode browse-kill-ring default-text-scale ivy projectile flycheck highlight-indent-guides company go-mode go-autocomplete gist exec-path-from-shell))))
+    (company-statistics markdown-preview-mode markdown-mode web-mode rjsx-mode js2-mode paredit cider iedit reason-mode apples-mode ag groovy-mode dockerfile-mode powerline haskell-mode scala-mode graphviz-dot-mode yaml-mode browse-kill-ring default-text-scale ivy projectile flycheck highlight-indent-guides company go-mode go-autocomplete gist exec-path-from-shell))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -221,6 +221,7 @@
   (global-set-key "\M-/" 'auto-complete))
 
 (add-hook 'after-init-hook 'global-company-mode)
+(add-hook 'after-init-hook 'company-statistics-mode)
 (global-set-key "\M-/" '(lambda (x)
                           (interactive "*P")
                           (if (company-mode-on)
