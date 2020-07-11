@@ -19,7 +19,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (company-statistics markdown-preview-mode markdown-mode web-mode rjsx-mode js2-mode paredit cider iedit reason-mode apples-mode ag groovy-mode dockerfile-mode powerline haskell-mode scala-mode graphviz-dot-mode yaml-mode browse-kill-ring default-text-scale ivy projectile flycheck highlight-indent-guides company go-mode go-autocomplete gist exec-path-from-shell))))
+    (dumb-jump magit company-statistics markdown-preview-mode markdown-mode web-mode rjsx-mode js2-mode paredit cider iedit reason-mode apples-mode ag groovy-mode dockerfile-mode powerline haskell-mode scala-mode graphviz-dot-mode yaml-mode browse-kill-ring default-text-scale ivy projectile flycheck highlight-indent-guides company go-mode go-autocomplete gist exec-path-from-shell))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -156,6 +156,7 @@
 ;(ivy-mode)
 
 (global-flycheck-mode)
+(setq flycheck-checker-error-threshold 10000)
 
 ;; web mode stuff
 (require 'web-mode)
@@ -517,6 +518,12 @@
 
 ; this is slow, use only when needed
 ;(load-file "~/emacs/graphviz-dot-mode.el")
+
+;; dumb jump mode is smart
+(dumb-jump-mode)
+(global-unset-key "\M-.")
+(global-set-key "\M-." 'dumb-jump-go)
+(setq dumb-jump-force-searcher 'ag)
 
 (provide '.emacs)
 ;;; .emacs ends here
