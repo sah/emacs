@@ -1,15 +1,12 @@
-;; Added by Package.el.  This must come before configurations of
-;; installed packages.  Don't delete this line.  If you don't want it,
-;; just comment it out by adding a semicolon to the start of the line.
-;; You may delete these explanatory comments.
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
 
 (add-to-list 'load-path "~/emacs")
 (add-to-list 'load-path "~/emacs/emacs-color-theme-solarized")
 (add-to-list 'load-path "/usr/local/share/emacs/site-lisp")
-(require 'package)
-(add-to-list 'package-archives
-             '("melpa" . "http://melpa.milkbox.net/packages/") t)
+
+(setq prettier-enabled nil)
 
 (condition-case () (require 'local) (error nil))
 (custom-set-variables
@@ -17,9 +14,26 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(company-dabbrev-downcase nil)
  '(package-selected-packages
-   (quote
-    (dumb-jump magit company-statistics markdown-preview-mode markdown-mode web-mode rjsx-mode js2-mode paredit cider iedit reason-mode apples-mode ag groovy-mode dockerfile-mode powerline haskell-mode scala-mode graphviz-dot-mode yaml-mode browse-kill-ring default-text-scale ivy projectile flycheck highlight-indent-guides company go-mode go-autocomplete gist exec-path-from-shell))))
+   '(string-inflection blacken dumb-jump magit company-statistics markdown-preview-mode markdown-mode web-mode rjsx-mode js2-mode paredit cider iedit reason-mode apples-mode ag groovy-mode dockerfile-mode powerline haskell-mode scala-mode graphviz-dot-mode yaml-mode browse-kill-ring default-text-scale ivy projectile flycheck highlight-indent-guides company go-mode go-autocomplete gist exec-path-from-shell))
+ '(safe-local-variable-values
+   '((eval if
+           (buffer-file-name)
+           (if
+               (string-match "\\.m?jsx?\\'" buffer-file-name)
+               (prettier-mode t)))
+     (eval if
+           (buffer-file-name)
+           (if
+               (string-match
+                ("\\.m?jsx?\\'")
+                buffer-file-name)
+               (prettier-mode t)))
+     (prettier-enabled . t)
+     (eval enable-minor-mode
+           '("\\.m?jsx?\\'" . prettier-js-mode))
+     (eval prettier-mode t))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -168,8 +182,18 @@
 (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.jsx?$" . web-mode))
-(setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
+(add-to-list 'auto-mode-alist '("\\.m?jsx?$" . web-mode))
+(setq web-mode-content-types-alist '(("jsx" . "\\.[m]?js[x]?\\'")))
+
+(defun enable-minor-mode (my-pair)
+  "Enable minor mode if filename match the regexp.  MY-PAIR is a cons cell (regexp . minor-mode)."
+  (if (buffer-file-name)
+      (if (string-match (car my-pair) buffer-file-name)
+          (funcall (cdr my-pair)))))
+(add-hook 'web-mode-hook #'(lambda ()
+                             (if prettier-enabled
+                                 (enable-minor-mode
+                                  '("\\.m?jsx?\\'" . prettier-mode)))))
 
 ;; php mode stuff
 (autoload 'php-mode "php-mode" "PHP editing mode." t)
@@ -233,6 +257,9 @@
 (require 'yaml-mode)
 (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
 
+;; python-mode blacken stuff
+(setq blacken-only-if-project-is-blackened t)
+(add-hook 'python-mode-hook 'blacken-mode)
 
 ;; Emacs/W3 Configuration
 (condition-case () (require 'w3-auto "w3-auto") (error nil))
