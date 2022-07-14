@@ -95,7 +95,7 @@
 
   ;; We're working on a native project, load and use merlin
   (init-reason-merlin))
-(init-reason)
+;(init-reason)
 
 ; solarized
 (setq custom-theme-load-path '("~/emacs/emacs-color-theme-solarized"))
