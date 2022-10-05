@@ -4,15 +4,9 @@
 [submodule "textmate.el"]
 	path = textmate.el
 	url = https://github.com/defunkt/textmate.el.git
-[submodule "emacs-color-theme-solarized"]
-	path = emacs-color-theme-solarized
-	url = https://github.com/sellout/emacs-color-theme-solarized.git
 [submodule "emacs-powerline"]
 	path = emacs-powerline
 	url = ./emacs-powerline
 [submodule "indent-guide"]
 	path = indent-guide
 	url = https://github.com/zk-phi/indent-guide.git
-[submodule "merlin"]
-	path = merlin
-	url = git@github.com:ocaml/merlin.git

@@ -3,7 +3,6 @@
 (package-initialize)
 
 (add-to-list 'load-path "~/emacs")
-(add-to-list 'load-path "~/emacs/emacs-color-theme-solarized")
 (add-to-list 'load-path "/usr/local/share/emacs/site-lisp")
 
 (setq prettier-enabled nil)
@@ -33,7 +32,8 @@
      (prettier-enabled . t)
      (eval enable-minor-mode
            '("\\.m?jsx?\\'" . prettier-js-mode))
-     (eval prettier-mode t))))
+     (eval prettier-mode t)))
+ '(warning-suppress-log-types '((comp))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -95,14 +95,12 @@
 
   ;; We're working on a native project, load and use merlin
   (init-reason-merlin))
-;(init-reason)
+(init-reason)
 
 ; solarized
-(setq custom-theme-load-path '("~/emacs/emacs-color-theme-solarized"))
-(load-theme 'solarized t)
+(load-theme 'solarized-dark t)
 (set-frame-parameter nil 'background-mode 'dark)
 (set-terminal-parameter nil 'background-mode 'dark)
-(enable-theme 'solarized)
 
 ; fairyfloss
 ;(setq custom-theme-load-path '("~/emacs/fairyfloss"))
