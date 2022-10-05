@@ -15,7 +15,7 @@
  ;; If there is more than one, they won't work right.
  '(company-dabbrev-downcase nil)
  '(package-selected-packages
-   '(string-inflection blacken dumb-jump magit company-statistics markdown-preview-mode markdown-mode web-mode rjsx-mode js2-mode paredit cider iedit reason-mode apples-mode ag groovy-mode dockerfile-mode powerline haskell-mode scala-mode graphviz-dot-mode yaml-mode browse-kill-ring default-text-scale ivy projectile flycheck highlight-indent-guides company go-mode go-autocomplete gist exec-path-from-shell))
+   '(typescript-mode string-inflection blacken dumb-jump magit company-statistics markdown-preview-mode markdown-mode web-mode rjsx-mode js2-mode paredit cider iedit reason-mode apples-mode ag groovy-mode dockerfile-mode powerline haskell-mode scala-mode graphviz-dot-mode yaml-mode browse-kill-ring default-text-scale ivy projectile flycheck highlight-indent-guides company go-mode go-autocomplete gist exec-path-from-shell))
  '(safe-local-variable-values
    '((eval if
            (buffer-file-name)
