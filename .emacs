@@ -1,4 +1,11 @@
+;; Added by Package.el.  This must come before configurations of
+;; installed packages.  Don't delete this line.  If you don't want it,
+;; just comment it out by adding a semicolon to the start of the line.
+;; You may delete these explanatory comments.
+
 (require 'package)
+;;(add-to-list 'package-archives
+;;             '("melpa" . "http://melpa.milkbox.net/packages/") t)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
 
@@ -15,7 +22,8 @@
  ;; If there is more than one, they won't work right.
  '(company-dabbrev-downcase nil)
  '(package-selected-packages
-   '(typescript-mode string-inflection blacken dumb-jump magit company-statistics markdown-preview-mode markdown-mode web-mode rjsx-mode js2-mode paredit cider iedit reason-mode apples-mode ag groovy-mode dockerfile-mode powerline haskell-mode scala-mode graphviz-dot-mode yaml-mode browse-kill-ring default-text-scale ivy projectile flycheck highlight-indent-guides company go-mode go-autocomplete gist exec-path-from-shell))
+   (quote
+    (magit blacken tide typescript-mode clang-format+ clang-format prettier-js prettier arduino-mode markdown-preview-mode markdown-mode web-mode rjsx-mode js2-mode paredit cider iedit reason-mode apples-mode ag groovy-mode dockerfile-mode powerline haskell-mode scala-mode graphviz-dot-mode yaml-mode browse-kill-ring default-text-scale ivy projectile flycheck highlight-indent-guides company go-mode go-autocomplete gist exec-path-from-shell string-inflection dumb-jump magit company-statistics)))
  '(safe-local-variable-values
    '((eval if
            (buffer-file-name)
@@ -34,6 +42,7 @@
            '("\\.m?jsx?\\'" . prettier-js-mode))
      (eval prettier-mode t)))
  '(warning-suppress-log-types '((comp))))
+
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -193,6 +202,29 @@
                                  (enable-minor-mode
                                   '("\\.m?jsx?\\'" . prettier-mode)))))
 
+;; typescript stuff
+(defun setup-tide-mode ()
+  (interactive)
+  (tide-setup)
+  (flycheck-mode +1)
+  (setq flycheck-check-syntax-automatically '(save mode-enabled))
+  (eldoc-mode +1)
+  (tide-hl-identifier-mode +1)
+  (prettier-mode +1)
+  ;; company is an optional dependency. You have to
+  ;; install it separately via package-install
+  ;; `M-x package-install [ret] company`
+  (company-mode +1))
+
+;; aligns annotation to the right hand side
+(setq company-tooltip-align-annotations t)
+
+;; formats the buffer before saving -- not as good as prettier-mode
+;;(add-hook 'before-save-hook 'tide-format-before-save)
+
+(add-hook 'typescript-mode-hook #'setup-tide-mode)
+(setq tide-format-options '(:indentSize 2))
+
 ;; php mode stuff
 (autoload 'php-mode "php-mode" "PHP editing mode." t)
 (add-to-list 'auto-mode-alist '("\\.php$" . php-mode))
@@ -302,6 +334,7 @@
   (setq c-basic-indent 4) ;; xemacs
   (setq c-basic-offset 4) ;; emacs
   (setq ruby-indent-level 4) ;; ruby-mode is stupid
+  (setq typescript-indent-level 2) ;; typescript-mode is also stupid
 
   (modify-syntax-entry ?_ "_") ;; don't word-move over underscores
 
