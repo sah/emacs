@@ -104,7 +104,7 @@
 
   ;; We're working on a native project, load and use merlin
   (init-reason-merlin))
-(init-reason)
+;(init-reason)
 
 ; solarized
 (load-theme 'solarized-dark t)
