@@ -176,6 +176,7 @@
 
 (ivy-mode)
 (ivy-define-key ivy-minibuffer-map (kbd "TAB") #'ivy-partial)  ; I don't want pressing tab repeatedly to pick something
+(ivy-define-key ivy-minibuffer-map (kbd "<up>") #'ivy-previous-line-or-history)
 
 (global-flycheck-mode)
 (setq flycheck-checker-error-threshold 10000)
