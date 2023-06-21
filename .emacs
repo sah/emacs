@@ -12,7 +12,7 @@
 (add-to-list 'load-path "~/emacs")
 (add-to-list 'load-path "/usr/local/share/emacs/site-lisp")
 
-(setq prettier-enabled nil)
+(setq prettier-enabled t)
 
 (condition-case () (require 'local) (error nil))
 (custom-set-variables
@@ -174,7 +174,8 @@
         (propertize (format (format "%%%dd " w) line) 'face 'linum)))
     (setq linum-format 'linum-format-func)))
 
-;(ivy-mode)
+(ivy-mode)
+(ivy-define-key ivy-minibuffer-map (kbd "TAB") #'ivy-partial)  ; I don't want pressing tab repeatedly to pick something
 
 (global-flycheck-mode)
 (setq flycheck-checker-error-threshold 10000)
@@ -579,9 +580,9 @@
 
 ;; dumb jump mode is smart
 (dumb-jump-mode)
-(global-unset-key "\M-.")
-(global-set-key "\M-." 'dumb-jump-go)
 (setq dumb-jump-force-searcher 'ag)
+(add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
+(setq xref-show-definitions-function #'xref-show-definitions-completing-read)
 
 (provide '.emacs)
 ;;; .emacs ends here
