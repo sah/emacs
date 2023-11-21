@@ -22,9 +22,11 @@
  ;; If there is more than one, they won't work right.
  '(company-dabbrev-downcase nil)
  '(package-selected-packages
-   '(magit blacken tide typescript-mode clang-format+ clang-format prettier arduino-mode markdown-preview-mode markdown-mode web-mode rjsx-mode js2-mode paredit cider iedit reason-mode apples-mode ag groovy-mode dockerfile-mode powerline haskell-mode scala-mode graphviz-dot-mode yaml-mode browse-kill-ring default-text-scale ivy projectile flycheck highlight-indent-guides company go-mode go-autocomplete gist exec-path-from-shell string-inflection dumb-jump magit company-statistics))
+   (quote
+    (magit blacken tide typescript-mode clang-format+ clang-format prettier arduino-mode markdown-preview-mode markdown-mode web-mode rjsx-mode js2-mode paredit cider iedit reason-mode apples-mode ag groovy-mode dockerfile-mode powerline haskell-mode scala-mode graphviz-dot-mode yaml-mode browse-kill-ring default-text-scale ivy projectile flycheck highlight-indent-guides company go-mode go-autocomplete gist exec-path-from-shell string-inflection dumb-jump magit company-statistics)))
  '(safe-local-variable-values
-   '((eval if
+   (quote
+    ((eval if
            (buffer-file-name)
            (if
                (string-match "\\.m?jsx?\\'" buffer-file-name)
@@ -37,8 +39,8 @@
                 buffer-file-name)
                (prettier-mode t)))
      (prettier-enabled . t)
-     (eval prettier-mode t)))
- '(warning-suppress-log-types '((comp))))
+     (eval prettier-mode t))))
+ '(warning-suppress-log-types (quote ((comp)))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -193,6 +195,29 @@
                              (if prettier-enabled
                                  (enable-minor-mode
                                   '("\\.m?jsx?\\'" . prettier-mode)))))
+
+;; typescript stuff
+(defun setup-tide-mode ()
+  (interactive)
+  (tide-setup)
+  (flycheck-mode +1)
+  (setq flycheck-check-syntax-automatically '(save mode-enabled))
+  (eldoc-mode +1)
+  (tide-hl-identifier-mode +1)
+  (prettier-mode +1)
+  ;; company is an optional dependency. You have to
+  ;; install it separately via package-install
+  ;; `M-x package-install [ret] company`
+  (company-mode +1))
+
+;; aligns annotation to the right hand side
+(setq company-tooltip-align-annotations t)
+
+;; formats the buffer before saving -- not as good as prettier-mode
+;;(add-hook 'before-save-hook 'tide-format-before-save)
+
+(add-hook 'typescript-mode-hook #'setup-tide-mode)
+(setq tide-format-options '(:indentSize 2))
 
 ;; typescript stuff
 (defun setup-tide-mode ()
