@@ -180,6 +180,7 @@
 
 (global-flycheck-mode)
 (setq flycheck-checker-error-threshold 10000)
+(setq-default flycheck-disabled-checkers '(python-pylint))
 
 ;; web mode stuff
 (require 'web-mode)
