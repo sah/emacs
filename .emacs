@@ -22,8 +22,7 @@
  ;; If there is more than one, they won't work right.
  '(company-dabbrev-downcase nil)
  '(package-selected-packages
-   (quote
-    (magit blacken tide typescript-mode clang-format+ clang-format prettier-js prettier arduino-mode markdown-preview-mode markdown-mode web-mode rjsx-mode js2-mode paredit cider iedit reason-mode apples-mode ag groovy-mode dockerfile-mode powerline haskell-mode scala-mode graphviz-dot-mode yaml-mode browse-kill-ring default-text-scale ivy projectile flycheck highlight-indent-guides company go-mode go-autocomplete gist exec-path-from-shell string-inflection dumb-jump magit company-statistics)))
+   '(magit blacken tide typescript-mode clang-format+ clang-format prettier arduino-mode markdown-preview-mode markdown-mode web-mode rjsx-mode js2-mode paredit cider iedit reason-mode apples-mode ag groovy-mode dockerfile-mode powerline haskell-mode scala-mode graphviz-dot-mode yaml-mode browse-kill-ring default-text-scale ivy projectile flycheck highlight-indent-guides company go-mode go-autocomplete gist exec-path-from-shell string-inflection dumb-jump magit company-statistics))
  '(safe-local-variable-values
    '((eval if
            (buffer-file-name)
@@ -38,8 +37,6 @@
                 buffer-file-name)
                (prettier-mode t)))
      (prettier-enabled . t)
-     (eval enable-minor-mode
-           '("\\.m?jsx?\\'" . prettier-js-mode))
      (eval prettier-mode t)))
  '(warning-suppress-log-types '((comp))))
 
@@ -164,15 +161,7 @@
     ))
 
 ;; for line numbers
-(require 'linum)
-(global-linum-mode 1)
-(unless window-system
-  (progn
-    (defun linum-format-func (line)
-      "Align number for LINE right and pad the right with one space."
-      (let ((w (length (number-to-string (count-lines (point-min) (point-max))))))
-        (propertize (format (format "%%%dd " w) line) 'face 'linum)))
-    (setq linum-format 'linum-format-func)))
+(global-display-line-numbers-mode 1)
 
 (ivy-mode)
 (ivy-define-key ivy-minibuffer-map (kbd "TAB") #'ivy-partial)  ; I don't want pressing tab repeatedly to pick something
