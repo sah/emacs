@@ -357,16 +357,16 @@
 ;; M-x describe-variable RET treesit-auto-recipe-list
 (defvar my/ts-languages
   '(;; (regex ts-mode grammar-lang)
-    ("\\.c\\'"     c-ts-mode          c)
+    ("\\.c\\'" c-ts-mode c)
     ("\\.\\(cc\\|cpp\\|hh\\|hpp\\)\\'" c++-ts-mode cpp)
-    ("\\.py\\'"    python-ts-mode     python)
-    ("\\.js\\'"    js-ts-mode         javascript)
-    ("\\.jsx\\'"   js-ts-mode         javascript)
-    ("\\.ts\\'"    typescript-ts-mode typescript)
-    ("\\.tsx\\'"   tsx-ts-mode        tsx)
-    ("\\.go\\'"    go-ts-mode         go)
-    ("\\.rb\\'"    ruby-ts-mode       ruby)
-    ("\\.ya?ml\\'" yaml-ts-mode       yaml)))
+    ("\\.py\\'" python-ts-mode python)
+    ("\\.m?js\\'" js-ts-mode javascript)
+    ("\\.jsx\\'" js-ts-mode javascript)
+    ("\\.ts\\'" typescript-ts-mode typescript)
+    ("\\.tsx\\'" tsx-ts-mode tsx)
+    ("\\.go\\'" go-ts-mode go)
+    ("\\.rb\\'" ruby-ts-mode ruby)
+    ("\\.ya?ml\\'" yaml-ts-mode yaml)))
 
 (defun my/ts-grammar-source (lang)
   "Look up LANG's grammar source in treesit-auto's recipe list."
@@ -606,11 +606,11 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    '(ag apheleia arduino-mode browse-kill-ring cape catppuccin-theme consult
-     copilot corfu default-text-scale dockerfile-mode doom-modeline dumb-jump
-     ef-themes editorconfig embark embark-consult exec-path-from-shell
-     flexoki-themes go-mode graphviz-dot-mode iedit magit marginalia
-     markdown-mode modus-themes orderless projectile reformatter
-     standard-themes treesit-auto vertico web-mode yaml-mode)))
+        copilot corfu default-text-scale dockerfile-mode doom-modeline dumb-jump
+        ef-themes editorconfig embark embark-consult exec-path-from-shell
+        flexoki-themes go-mode graphviz-dot-mode iedit magit marginalia
+        markdown-mode modus-themes orderless projectile reformatter
+        standard-themes treesit-auto vertico web-mode yaml-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
