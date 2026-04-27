@@ -26,6 +26,26 @@
 
 (setq use-package-always-ensure t)
 
+;; Send Customize-saved values to a separate file so they don't rewrite init.el.
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+(when (file-exists-p custom-file) (load custom-file))
+
+;; Load per-machine config (e.g., (setq my/local-packages '(copilot))).
+(defvar my/local-packages nil)
+(let ((local (expand-file-name "local.el" user-emacs-directory)))
+  (when (file-exists-p local) (load local)))
+
+;; Canonical package list — authoritative; autoremove uses it on each startup.
+(setq package-selected-packages
+      (append '(ag apheleia arduino-mode browse-kill-ring cape catppuccin-theme
+                   consult corfu default-text-scale dockerfile-mode doom-modeline
+                   dumb-jump ef-themes editorconfig embark embark-consult
+                   exec-path-from-shell flexoki-themes go-mode
+                   iedit magit marginalia markdown-mode modus-themes orderless
+                   projectile reformatter standard-themes treesit-auto vertico
+                   web-mode yaml-mode)
+              my/local-packages))
+
 ;; Restore GC threshold after startup
 (add-hook 'emacs-startup-hook
           (lambda () (setq gc-cons-threshold (* 64 1024 1024))))
@@ -290,21 +310,22 @@
 ;;; LSP via eglot + flymake (both built-in)
 ;;; ----------------------------------------------------------------
 
-;; Don't block on eglot handshake when opening a file; let the file load, and
-;; eglot can come online once the server is ready.
-(defun my/eglot-ensure-async ()
+;; Defer FN until idle, then run it in the original buffer if still alive.
+(defun my/run-async-in-buffer (fn)
   (when buffer-file-name
     (let ((buf (current-buffer)))
       (run-with-idle-timer 0 nil
                            (lambda ()
                              (when (buffer-live-p buf)
-                               (with-current-buffer buf
-                                 (eglot-ensure)
-                                 ;; eglot-ensure installs its connect on
-                                 ;; post-command-hook, which a timer callback
-                                 ;; doesn't trigger; run it so connect happens
-                                 ;; now.
-                                 (run-hooks 'post-command-hook))))))))
+                               (with-current-buffer buf (funcall fn))))))))
+
+;; Don't block file open on the eglot handshake; eglot comes online once its server is ready.
+(defun my/eglot-ensure-async ()
+  (my/run-async-in-buffer
+   (lambda ()
+     (eglot-ensure)
+     ;; eglot-ensure connects via post-command-hook, which timers don't trigger.
+     (run-hooks 'post-command-hook))))
 
 (use-package eglot
   :ensure nil
@@ -414,33 +435,33 @@
   (setq xref-show-definitions-function
         #'xref-show-definitions-completing-read))
 
-;; Don't block on copilot agent startup when opening a file; let the file load, and copilot can come online once its agent is ready.
+;; Skip copilot when its language server isn't installed; otherwise don't block
+;; file open — copilot comes online once its agent is ready.
 (defun my/copilot-async ()
-  (when buffer-file-name
-    (let ((buf (current-buffer)))
-      (run-with-idle-timer 0 nil
-                           (lambda ()
-                             (when (buffer-live-p buf)
-                               (with-current-buffer buf (copilot-mode 1))))))))
+  (when (file-directory-p (expand-file-name ".cache/copilot/bin"
+                                            user-emacs-directory))
+    (my/run-async-in-buffer (lambda () (copilot-mode 1)))))
 
-(use-package copilot
-  :hook (prog-mode . my/copilot-async)
-  :bind (:map copilot-completion-map
-              ("<tab>" . copilot-accept-completion)
-              ("TAB"   . copilot-accept-completion)
-              ("C-<tab>" . copilot-accept-completion-by-word)))
+;; Copilot is per-machine — opt in via my/local-packages in local.el.
+(when (memq 'copilot package-selected-packages)
+  (use-package copilot
+    :hook (prog-mode . my/copilot-async)
+    :bind (:map copilot-completion-map
+                ("<tab>" . copilot-accept-completion)
+                ("TAB"   . copilot-accept-completion)
+                ("C-<tab>" . copilot-accept-completion-by-word)))
 
-(with-eval-after-load 'copilot
-  (dolist (entry '((emacs-lisp-mode      . lisp-body-indent)
-                   (c-ts-mode            . c-ts-mode-indent-offset)
-                   (c++-ts-mode          . c-ts-mode-indent-offset)
-                   (python-ts-mode       . python-indent-offset)
-                   (js-ts-mode           . js-indent-level)
-                   (typescript-ts-mode   . typescript-ts-mode-indent-offset)
-                   (tsx-ts-mode          . typescript-ts-mode-indent-offset)
-                   (go-ts-mode           . go-ts-mode-indent-offset)
-                   (ruby-ts-mode         . ruby-indent-level)))
-    (add-to-list 'copilot-indentation-alist (list (car entry) (cdr entry)))))
+  (with-eval-after-load 'copilot
+    (dolist (entry '((emacs-lisp-mode      . lisp-body-indent)
+                     (c-ts-mode            . c-ts-mode-indent-offset)
+                     (c++-ts-mode          . c-ts-mode-indent-offset)
+                     (python-ts-mode       . python-indent-offset)
+                     (js-ts-mode           . js-indent-level)
+                     (typescript-ts-mode   . typescript-ts-mode-indent-offset)
+                     (tsx-ts-mode          . typescript-ts-mode-indent-offset)
+                     (go-ts-mode           . go-ts-mode-indent-offset)
+                     (ruby-ts-mode         . ruby-indent-level)))
+      (add-to-list 'copilot-indentation-alist (list (car entry) (cdr entry))))))
 
 ;; (use-package paredit
 ;;   :hook ((emacs-lisp-mode lisp-mode scheme-mode) . paredit-mode))
@@ -468,7 +489,6 @@
 (use-package dockerfile-mode :defer t)
 (use-package arduino-mode :defer t)
 (use-package markdown-mode :defer t)
-(use-package graphviz-dot-mode)
 ;; Python: ruff via reformatter
 (use-package reformatter
   :hook ((python-mode    . ruff-format-on-save-mode)
@@ -599,21 +619,3 @@
 
 (provide 'init)
 ;;; init.el ends here
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(ag apheleia arduino-mode browse-kill-ring cape catppuccin-theme consult
-        copilot corfu default-text-scale dockerfile-mode doom-modeline dumb-jump
-        ef-themes editorconfig embark embark-consult exec-path-from-shell
-        flexoki-themes go-mode graphviz-dot-mode iedit magit marginalia
-        markdown-mode modus-themes orderless projectile reformatter
-        standard-themes treesit-auto vertico web-mode yaml-mode)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
