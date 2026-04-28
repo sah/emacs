@@ -41,7 +41,7 @@
                    exec-path-from-shell flexoki-themes go-mode
                    iedit magit marginalia markdown-mode modus-themes orderless
                    projectile reformatter standard-themes treesit-auto vertico
-                   web-mode yaml-mode)
+                   web-mode wgrep yaml-mode)
               my/local-packages))
 
 ;; Restore GC threshold after startup
@@ -255,7 +255,8 @@
 (use-package consult
   :bind (("C-x b"   . consult-buffer)
          ("M-y"     . consult-yank-pop)
-         ("M-s l"     . consult-line)
+         ("M-s l"   . consult-line)
+         ("C-c s"   . consult-ripgrep)
          ("M-g g"   . consult-goto-line)
          ("M-g M-g" . consult-goto-line)))
 
@@ -407,6 +408,29 @@
 ;;; ----------------------------------------------------------------
 
 (use-package magit :bind ("C-x g" . magit-status))
+
+(use-package wgrep
+  :custom (wgrep-auto-save-buffer t)
+  :bind (:map grep-mode-map
+              ("e" . wgrep-change-to-wgrep-mode)))
+
+;; C-c e while in consult-ripgrep: export all matches to a grep buffer and
+;; enter wgrep so they can be edited in place and written back to disk at once.
+(defun my/consult-ripgrep-to-wgrep ()
+  (interactive)
+  (letrec ((hook (lambda ()
+                   (let ((buf (current-buffer)))
+                     (run-with-idle-timer 0 nil
+                       (lambda ()
+                         (with-current-buffer buf
+                           (wgrep-change-to-wgrep-mode)))))
+                   (remove-hook 'grep-mode-hook hook))))
+    (add-hook 'grep-mode-hook hook))
+  (embark-export))
+
+(with-eval-after-load 'vertico
+  (define-key vertico-map (kbd "C-c e") #'my/consult-ripgrep-to-wgrep))
+
 (use-package projectile :defer 1 :config (projectile-mode 1))
 (use-package ag :defer t)
 (use-package iedit)
