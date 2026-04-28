@@ -4,8 +4,6 @@
 ;;; Package management
 ;;; ----------------------------------------------------------------
 
-(setq use-package-compute-statistics t)
-
 (require 'cl-lib)
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
@@ -48,16 +46,8 @@
 
 ;; Restore GC threshold after startup
 (add-hook 'emacs-startup-hook
-          (lambda () (setq gc-cons-threshold (* 64 1024 1024))))
-
-;; Native-compile all installed packages in the background on first run.
-;; Already-compiled files are skipped, so this is safe to run every startup.
-(when (native-comp-available-p)
-  (add-hook 'emacs-startup-hook
-            (lambda ()
-              (native-compile-async
-               (expand-file-name "elpa" user-emacs-directory)
-               'recursively))))
+          (lambda ()
+            (setq gc-cons-threshold (* 64 1024 1024))))
 
 ;; Remove packages no longer referenced in init.el after each startup.
 (defun my/package-autoremove-quietly ()
