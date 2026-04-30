@@ -252,11 +252,19 @@
 
 (use-package marginalia :init (marginalia-mode))
 
+(defun my/consult-ripgrep-region ()
+  (interactive)
+  (consult-ripgrep nil (cond ((use-region-p)
+                              (buffer-substring-no-properties
+                               (region-beginning) (region-end)))
+                             ((symbol-at-point)
+                              (symbol-name (symbol-at-point))))))
+
 (use-package consult
   :bind (("C-x b"   . consult-buffer)
          ("M-y"     . consult-yank-pop)
          ("M-s l"   . consult-line)
-         ("C-c s"   . consult-ripgrep)
+         ("C-c s"   . my/consult-ripgrep-region)
          ("M-g g"   . consult-goto-line)
          ("M-g M-g" . consult-goto-line)))
 
