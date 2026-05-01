@@ -15,4 +15,4 @@
 (setq native-comp-async-report-warnings-errors 'silent)
 
 (push '(font . "JetBrains Mono:weight=ultralight:size=16") default-frame-alist)
-;;(push '(font . "Fira Code Light-16") default-frame-alist)
+;;(push '(font . "Fira Code:weight=light:size=16") default-frame-alist)
