@@ -253,12 +253,44 @@
 (use-package marginalia :init (marginalia-mode))
 
 (defun my/consult-ripgrep-region ()
+  "Run consult-ripgrep, pre-filling the query from region or symbol at point.
+Typing immediately replaces the pre-filled value; backspace or navigating
+through results commits to editing it normally."
   (interactive)
-  (consult-ripgrep nil (cond ((use-region-p)
-                              (buffer-substring-no-properties
-                               (region-beginning) (region-end)))
-                             ((symbol-at-point)
-                              (symbol-name (symbol-at-point))))))
+  (let ((initial (cond ((use-region-p)
+                        (buffer-substring-no-properties
+                         (region-beginning) (region-end)))
+                       ((symbol-at-point)
+                        (symbol-name (symbol-at-point))))))
+    (minibuffer-with-setup-hook
+        (lambda ()
+          (when initial
+            ;; consult-ripgrep starts the minibuffer with "#"; insert after it
+            (insert initial)
+            ;; fresh = first keystroke hasn't happened yet
+            (let ((fresh t))
+              (add-hook 'pre-command-hook
+                        (lambda ()
+                          (when fresh
+                            (cond
+                             ;; first typed character replaces the pre-fill,
+                             ;; preserving the leading "#" consult uses as a separator
+                             ((eq this-command 'self-insert-command)
+                              (let ((start (minibuffer-prompt-end)))
+                                (delete-region
+                                 (if (eq (char-after start) ?#) (1+ start) start)
+                                 (point-max)))
+                              (setq fresh nil))
+                             ;; backspace, navigation, or vertico result browsing
+                             ;; all commit to normal editing without clearing
+                             ((or (not (string-match-p "\\`vertico-"
+                                                       (symbol-name this-command)))
+                                  (memq this-command
+                                        '(vertico-next vertico-previous
+                                          vertico-scroll-up vertico-scroll-down)))
+                              (setq fresh nil)))))
+                        nil t))))
+      (consult-ripgrep nil nil))))
 
 (use-package consult
   :bind (("C-x b"   . consult-buffer)
