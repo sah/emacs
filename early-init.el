@@ -14,5 +14,5 @@
 ;; Native-comp: silence warnings buffer, still log to *Messages*
 (setq native-comp-async-report-warnings-errors 'silent)
 
-;(push '(font . "JetBrains Mono-16") default-frame-alist)
-(push '(font . "Fira Code-16") default-frame-alist)
+(push '(font . "JetBrains Mono-16") default-frame-alist)
+;;(push '(font . "Fira Code-16") default-frame-alist)

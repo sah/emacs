@@ -40,7 +40,7 @@
                    dumb-jump ef-themes editorconfig embark embark-consult
                    exec-path-from-shell flexoki-themes go-mode
                    iedit magit marginalia markdown-mode modus-themes orderless
-                   projectile reformatter standard-themes treesit-auto vertico
+                   projectile standard-themes treesit-auto vertico
                    web-mode wgrep yaml-mode)
               my/local-packages))
 
@@ -537,20 +537,14 @@ through results commits to editing it normally."
 (use-package apheleia
   :defer 1
   :config
+  (setf (alist-get 'python-mode apheleia-mode-alist) '(ruff-isort ruff))
+  (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(ruff-isort ruff))
   (apheleia-global-mode +1))
 
 (use-package yaml-mode :mode "\\.ya?ml\\'")
 (use-package dockerfile-mode :defer t)
 (use-package arduino-mode :defer t)
 (use-package markdown-mode :defer t)
-;; Python: ruff via reformatter
-(use-package reformatter
-  :hook ((python-mode    . ruff-format-on-save-mode)
-         (python-ts-mode . ruff-format-on-save-mode))
-  :config
-  (reformatter-define ruff-format
-    :program "ruff"
-    :args `("format" "--stdin-filename" ,buffer-file-name "-")))
 
 ;; Go: gofmt/goimports on save
 (use-package go-mode
@@ -602,12 +596,13 @@ through results commits to editing it normally."
     (make-local-variable 'paragraph-start)
     (make-local-variable 'paragraph-separate)
     (c-set-style "linux"))
-  (setq c-basic-indent       4
-        c-basic-offset       4
-        ruby-indent-level    4
-        typescript-indent-level 2)
+  (setq c-basic-indent 4
+        c-basic-offset 4
+        ruby-indent-level 4
+        typescript-indent-level 2
+        js-indent-level 2)
   (modify-syntax-entry ?_ "_")
-  (setq tab-width        8
+  (setq tab-width 8
         indent-tabs-mode nil)
   (infer-indentation-style)
   (c-set-offset 'case-label '+)
