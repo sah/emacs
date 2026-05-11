@@ -38,7 +38,7 @@
       (append '(ag apheleia arduino-mode browse-kill-ring cape catppuccin-theme
                    consult corfu default-text-scale dockerfile-mode doom-modeline
                    dumb-jump ef-themes editorconfig embark embark-consult
-                   exec-path-from-shell flexoki-themes go-mode
+                   envrc exec-path-from-shell flexoki-themes go-mode
                    iedit magit marginalia markdown-mode modus-themes orderless
                    projectile standard-themes treesit-auto vertico
                    web-mode wgrep yaml-mode)
@@ -61,6 +61,10 @@
 (use-package exec-path-from-shell
   :if (memq window-system '(mac ns))
   :config (exec-path-from-shell-initialize))
+
+;; Apply .envrc per-directory so tools like basedpyright see the right venv
+(use-package envrc
+  :init (envrc-global-mode))
 
 ;; Don't prompt about following symlinks to vc files, it's fine.
 (setq vc-follow-symlinks t)
@@ -500,6 +504,7 @@ through results commits to editing it normally."
 (when (memq 'copilot package-selected-packages)
   (use-package copilot
     :hook (prog-mode . my/copilot-async)
+    :custom (copilot-max-char -1)
     :bind (:map copilot-completion-map
                 ("<tab>" . copilot-accept-completion)
                 ("TAB"   . copilot-accept-completion)
