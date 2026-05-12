@@ -345,6 +345,11 @@ through results commits to editing it normally."
 ;;; LSP via eglot + flymake (both built-in)
 ;;; ----------------------------------------------------------------
 
+;; Keep type info in minibuffer to a single line and ensure it shows the
+;; beginning of the type (not the middle/end) by truncating long lines.
+(setq eldoc-echo-area-use-multiline-p nil)
+(setq truncate-echo-area-messages t)
+
 ;; Defer FN until idle, then run it in the original buffer if still alive.
 (defun my/run-async-in-buffer (fn)
   (when buffer-file-name
